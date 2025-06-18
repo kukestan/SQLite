@@ -25,6 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        // 测试代码，避免重复数据
         context.deleteDatabase(DATABASE_NAME);
     }
 

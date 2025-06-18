@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="com.dream.providers.telephony"
+        coreApp="true"
+        android:sharedUserId="android.uid.phone">
+        
+        
+        
+    <application android:process="com.android.phone"
+                 android:allowClearUserData="false"
+                 android:fullBackupOnly="true"
+                 android:backupInForeground="true"
+                 android:restoreAnyVersion="true"
+                 android:usesCleartextTraffic="true"
+                 android:defaultToDeviceProtectedStorage="true"
+                 android:directBootAware="true">
+         
+        <provider android:name="DreamTelephonyProvider"
+                 android:authorities="dream"
+                 android:exported="true"
+                 android:singleUser="true"
+                 android:multiprocess="false" />
+
+    </application>
+</manifest>
