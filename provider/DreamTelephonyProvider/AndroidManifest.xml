@@ -4,9 +4,19 @@
         package="com.dream.providers.telephony"
         coreApp="true"
         android:sharedUserId="android.uid.phone">
-        
-        
-        
+
+
+    <!-- 定义读权限 -->
+    <permission
+        android:name="com.dream.providers.telephony.READ_USERS"
+        android:label="Read Users Permission"
+        android:protectionLevel="normal" />
+    <!-- 定义写权限 -->
+    <permission
+        android:name="com.dream.providers.telephony.WRITE_USERS"
+        android:label="Write Users Permission"
+        android:protectionLevel="normal" />
+
     <application android:process="com.android.phone"
                  android:allowClearUserData="false"
                  android:fullBackupOnly="true"

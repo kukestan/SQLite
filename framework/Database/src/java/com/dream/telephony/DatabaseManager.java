@@ -61,9 +61,9 @@ public class DatabaseManager implements IDatabaseManager {
         if (cursor.moveToFirst()) {
             do {
                 User user = new User();
-                user.setId(cursor.getInt(0));
-                user.setName(cursor.getString(1));
-                user.setAge(cursor.getInt(2));
+                user.setId(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID)));
+                user.setName(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME)));
+                user.setAge(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_AGE)));
                 userList.add(user);
             } while (cursor.moveToNext());
         }
@@ -73,12 +73,16 @@ public class DatabaseManager implements IDatabaseManager {
 
     @Override
     public List<User> getData(int id) {
-        return getAllData("id = ?", new String[]{Integer.toString(id)});
+        String selection = DatabaseHelper.COLUMN_ID + " = ?";
+        String[] selectionArgs = new String[]{Integer.toString(id)};
+        return getAllData(selection, selectionArgs);
     }
 
     @Override
     public List<User> getData(String name) {
-        return getAllData("name = ?", new String[]{name});
+        String selection = DatabaseHelper.COLUMN_NAME + " = ?";
+        String[] selectionArgs = new String[]{name};
+        return getAllData(selection, selectionArgs);
     }
 
     @Override

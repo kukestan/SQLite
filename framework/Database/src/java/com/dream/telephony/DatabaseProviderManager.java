@@ -5,6 +5,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.provider.Telephony;
 import android.telephony.Rlog;
 
 import java.util.ArrayList;
@@ -15,9 +18,18 @@ public class DatabaseProviderManager implements IDatabaseManager{
     private static final String BASE_PATH = "users";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
     private final ContentResolver mContentResolver;
+    private Context mContext;
+    private DatabaseObserver mDatabaseObserver;
+    private HandlerThread mHandlerThread;
+    private final Handler mHandler;
 
     public DatabaseProviderManager(Context context) {
-        mContentResolver = context.getContentResolver();
+        mContext = context;
+        mContentResolver = mContext.getContentResolver();
+        mHandlerThread = new HandlerThread("DatabaseProviderManager");
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+        registerContentObserver();
     }
 
     @Override
@@ -40,6 +52,7 @@ public class DatabaseProviderManager implements IDatabaseManager{
     @Override
     public int deleteData(int userId) {
         Uri uri = Uri.withAppendedPath(CONTENT_URI, String.valueOf(userId));
+        Rlog.d("DatabaseProviderManager", "deleteData uri = " + uri.toString());
         return mContentResolver.delete(uri, null, null);
     }
 
@@ -80,6 +93,30 @@ public class DatabaseProviderManager implements IDatabaseManager{
         return getAllData(DatabaseHelper.COLUMN_NAME + " = ?", new String[]{name});
     }
 
+    public List<User> getDataByIdUri(int id) {
+        Uri uri = Uri.withAppendedPath(CONTENT_URI, String.valueOf(id));
+
+        // 直接查询该 URI
+        Cursor cursor = mContentResolver.query(uri,null, null, null, null);
+
+        List<User> userList = new ArrayList<>();
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    do {
+                        User user = new User();
+                        user.setId(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID)));
+                        user.setName(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME)));
+                        user.setAge(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_AGE)));
+                        userList.add(user);
+                    } while (cursor.moveToNext());
+                }
+            } finally {
+                cursor.close(); // 确保 Cursor 被关闭
+            }
+        }
+        return userList;
+    }
     @Override
     public String getPath() {
         return "";
@@ -88,6 +125,16 @@ public class DatabaseProviderManager implements IDatabaseManager{
     @Override
     public void close() {
 
+    }
+
+    private void registerContentObserver() {
+        mDatabaseObserver = new DatabaseObserver(mContext, mHandler);
+
+        mContentResolver.registerContentObserver(
+                CONTENT_URI,
+                true,
+                mDatabaseObserver
+        );
     }
 
     public void test() {

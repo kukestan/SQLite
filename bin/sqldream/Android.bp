@@ -1,0 +1,23 @@
+// 定义一个可执行文件模块
+cc_binary {
+    // 模块名称，最终生成的二进制文件名
+    name: "sqldream",
+    // C++ 源文件路径
+    srcs: ["main.cpp"],
+    // 头文件搜索路径，如果你有额外的头文件目录可以添加在这里
+    local_include_dirs: [],
+    // 依赖的共享库
+    shared_libs: [
+        "libsqlite", // 依赖系统的 SQLite 库
+        "liblog",     // 依赖系统的日志库，方便调试时打日志
+    ],
+    // 编译选项
+    cflags: [
+        "-Wall", // 开启所有常见的编译警告
+        "-Werror", // 将所有警告视为错误
+    ],
+    // C++ 编译选项
+    cppflags: [
+        "-std=c++17", // 使用 C++17 标准
+    ],
+}
